@@ -15,7 +15,7 @@ CARC_KINGDOM_ID = 1274816593289019485
 BYTE_TEST_SERVER_ID = 1184448108042670170
 
 allowedGuilds = [
-    # CARC_KINGDOM_ID,
+    CARC_KINGDOM_ID,
     BYTE_TEST_SERVER_ID,
 ]
 
@@ -24,10 +24,12 @@ allowed_guilds_objects = [discord.Object(id=guild_id) for guild_id in allowedGui
 # ID of the user to timeout if "Yes" wins
 BENNY_ID = 797785685813493790
 SPLOOF_ID = 806964705008025611
+BYTE_ID = 253108416518553600
 
 SECOND_RATE_CITIZENS = {
     BENNY_ID,
-    SPLOOF_ID
+    SPLOOF_ID,
+    #BYTE_ID,
 }
 
 intents = discord.Intents.default()
@@ -54,7 +56,7 @@ async def hello(ctx):
 @app_commands.describe(user="The user to timeout if the vote passes")
 async def vote(interaction: discord.Interaction, user: discord.Member):
     await interaction.response.send_message(
-        f"{interaction.user.mention} started a vote to timeout {user.mention} started! ✅ = Yes, ❌ = No (30 seconds)",
+        f"{interaction.user.mention} started a vote to timeout {user.mention}! ✅ = Yes, ❌ = No (30 seconds)",
         ephemeral=False
     )
 
@@ -62,7 +64,7 @@ async def vote(interaction: discord.Interaction, user: discord.Member):
     await message.add_reaction("✅")
     await message.add_reaction("❌")
 
-    await asyncio.sleep(30)
+    await asyncio.sleep(2)
 
     message = await interaction.channel.fetch_message(message.id)
     yes_votes = 0
@@ -84,10 +86,11 @@ async def vote(interaction: discord.Interaction, user: discord.Member):
     if yes_votes / total_votes > 0.5:
         target_user = interaction.guild.get_member(user.id)
         if target_user: 
+            result += " " + str(datetime.timedelta(seconds=60))
             if target_user.id in SECOND_RATE_CITIZENS:
                 try:
                     # Timeout for 60 seconds
-                    await user.timeout(datetime.timedelta(minutes=1), reason="Vote passed to timeout user.")
+                    await user.timeout(datetime.timedelta(seconds=60), reason="Vote passed to timeout user.")
                     result += f"{user.mention} has been timed out!"
                 except discord.Forbidden:
                     result += "I don't have permission to timeout that user."
