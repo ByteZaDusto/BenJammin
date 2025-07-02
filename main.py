@@ -59,7 +59,11 @@ async def vote(interaction: discord.Interaction, user: discord.Member):
         f"{interaction.user.mention} started a vote to timeout {user.mention}! ✅ = Yes, ❌ = No (30 seconds)",
         ephemeral=False
     )
-
+    
+    if interaction.user.id != BYTE_ID:
+        await interaction.followup.send("Only Byte can use this command for now cause if anyone's gonna spam timeout Benny it's going to be ME")
+        return
+    
     message = await interaction.original_response()
     await message.add_reaction("✅")
     await message.add_reaction("❌")
