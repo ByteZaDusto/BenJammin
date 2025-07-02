@@ -64,7 +64,7 @@ async def vote(interaction: discord.Interaction, user: discord.Member):
     await message.add_reaction("✅")
     await message.add_reaction("❌")
 
-    await asyncio.sleep(2)
+    await asyncio.sleep(30)
 
     message = await interaction.channel.fetch_message(message.id)
     yes_votes = 0
