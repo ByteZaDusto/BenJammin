@@ -1,10 +1,28 @@
 import discord
 import datetime
+import asyncio
+import socket
+import threading
+import os
+
 from discord.ext import commands
 from discord import Object, app_commands, abc
 from dotenv import load_dotenv
-import os
-import asyncio
+
+
+# Optional fake server just to keep Render from killing the app
+def keep_port_open(port=10000):
+    def run_fake_server():
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('0.0.0.0', port))
+            s.listen()
+            while True:
+                conn, _ = s.accept()
+                conn.close()
+    threading.Thread(target=run_fake_server, daemon=True).start()
+
+# Start fake server on some port
+keep_port_open(10000)
 
 # Load environment variables
 load_dotenv("secrets.env")
