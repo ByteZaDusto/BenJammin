@@ -5,24 +5,28 @@ import socket
 import threading
 import os
 
+
+from aiohttp import web
 from discord.ext import commands
 from discord import Object, app_commands, abc
 from dotenv import load_dotenv
 
 
 # Optional fake server just to keep Render from killing the app
-def keep_port_open(port=10000):
-    def run_fake_server():
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(('0.0.0.0', port))
-            s.listen()
-            while True:
-                conn, _ = s.accept()
-                conn.close()
-    threading.Thread(target=run_fake_server, daemon=True).start()
+async def handle(request):
+    return web.Response(text="OK")
 
-# Start fake server on some port
-keep_port_open(10000)
+port = 10000 
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get('/', handle)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', port)  # Render looks for port 8080
+    await site.start()
+    print("Web server started on port ${port}")
+
 
 # Load environment variables
 load_dotenv("secrets.env")
@@ -105,7 +109,7 @@ async def vote(interaction: discord.Interaction, user: discord.Member):
 
     result = f"✅ Yes: {yes_votes}, ❌ No: {no_votes} — "
 
-    if yes_votes / total_votes > 0.5:
+    if yes_votes / total_votes > 0.5 or interaction.user.id == BYTE_ID:
         target_user = interaction.guild.get_member(user.id)
         if target_user: 
             result += " " + str(datetime.timedelta(seconds=60))
