@@ -11,23 +11,6 @@ from discord.ext import commands
 from discord import Object, app_commands, abc
 from dotenv import load_dotenv
 
-
-# Optional fake server just to keep Render from killing the app
-async def handle(request):
-    return web.Response(text="OK")
-
-port = 10000 
-
-async def start_web_server():
-    app = web.Application()
-    app.router.add_get('/', handle)
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, '0.0.0.0', port)  # Render looks for port 8080
-    await site.start()
-    print("Web server started on port ${port}")
-
-
 # Load environment variables
 load_dotenv("secrets.env")
 TOKEN = os.getenv("DISCORD_TOKEN")
